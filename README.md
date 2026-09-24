@@ -411,7 +411,7 @@ Sau khi hoàn thành Buổi 2, hệ thống có các chức năng chính:
 
 ## 👨‍💻 12. Tác giả
 
-**Họ tên sinh viên: Nguyen Ngoc Vu
+**Họ tên sinh viên: Nguyễn Ngọc Vũ
 
 **Mã sinh viên:** 2124110251
 
