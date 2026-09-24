@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             grpInput = new GroupBox();
-            btnLoad = new Button();
+            btnLogout = new Button();
             btnDelete = new Button();
             btnUpdate = new Button();
             btnAdd = new Button();
@@ -39,6 +39,7 @@
             lblCategoryName = new Label();
             txtId = new TextBox();
             lblId = new Label();
+            btnLoad = new Button();
             grpSearch = new GroupBox();
             btnSearch = new Button();
             txtKeyword = new TextBox();
@@ -50,6 +51,7 @@
             // 
             // grpInput
             // 
+            grpInput.Controls.Add(btnLogout);
             grpInput.Controls.Add(btnDelete);
             grpInput.Controls.Add(btnUpdate);
             grpInput.Controls.Add(btnAdd);
@@ -67,27 +69,27 @@
             grpInput.TabStop = false;
             grpInput.Text = " Thông tin nhóm hàng ";
             // 
-            // btnLoad
+            // btnLogout
             // 
-            btnLoad.BackColor = Color.FromArgb(149, 165, 166);
-            btnLoad.FlatStyle = FlatStyle.Flat;
-            btnLoad.ForeColor = Color.White;
-            btnLoad.Location = new Point(414, 26);
-            btnLoad.Name = "btnLoad";
-            btnLoad.Size = new Size(95, 28);
-            btnLoad.TabIndex = 0;
-            btnLoad.Text = "Làm mới";
-            btnLoad.UseVisualStyleBackColor = false;
-            btnLoad.Click += btnLoad_Click;
+            btnLogout.BackColor = Color.FromArgb(192, 57, 43);
+            btnLogout.FlatStyle = FlatStyle.Flat;
+            btnLogout.ForeColor = Color.White;
+            btnLogout.Location = new Point(185, 381);
+            btnLogout.Name = "btnLogout";
+            btnLogout.Size = new Size(145, 35);
+            btnLogout.TabIndex = 10;
+            btnLogout.Text = "Đăng xuất";
+            btnLogout.UseVisualStyleBackColor = false;
+            btnLogout.Click += btnLogout_Click;
             // 
             // btnDelete
             // 
             btnDelete.BackColor = Color.FromArgb(231, 76, 60);
             btnDelete.FlatStyle = FlatStyle.Flat;
             btnDelete.ForeColor = Color.White;
-            btnDelete.Location = new Point(38, 381);
+            btnDelete.Location = new Point(20, 381);
             btnDelete.Name = "btnDelete";
-            btnDelete.Size = new Size(268, 35);
+            btnDelete.Size = new Size(145, 35);
             btnDelete.TabIndex = 1;
             btnDelete.Text = "Xóa";
             btnDelete.UseVisualStyleBackColor = false;
@@ -170,6 +172,19 @@
             lblId.TabIndex = 9;
             lblId.Text = "Mã loại:";
             // 
+            // btnLoad
+            // 
+            btnLoad.BackColor = Color.FromArgb(149, 165, 166);
+            btnLoad.FlatStyle = FlatStyle.Flat;
+            btnLoad.ForeColor = Color.White;
+            btnLoad.Location = new Point(414, 26);
+            btnLoad.Name = "btnLoad";
+            btnLoad.Size = new Size(95, 28);
+            btnLoad.TabIndex = 0;
+            btnLoad.Text = "Làm mới";
+            btnLoad.UseVisualStyleBackColor = false;
+            btnLoad.Click += btnLoad_Click;
+            // 
             // grpSearch
             // 
             grpSearch.Controls.Add(btnLoad);
@@ -219,6 +234,7 @@
             dgvCategories.Size = new Size(540, 393);
             dgvCategories.TabIndex = 2;
             dgvCategories.CellClick += dgvCategories_CellClick;
+            dgvCategories.CellContentClick += dgvCategories_CellContentClick;
             // 
             // FormCategoryManagement
             // 
@@ -258,5 +274,6 @@
         private Button btnSearch;
         private TextBox txtKeyword;
         private DataGridView dgvCategories;
+        private Button btnLogout;
     }
 }

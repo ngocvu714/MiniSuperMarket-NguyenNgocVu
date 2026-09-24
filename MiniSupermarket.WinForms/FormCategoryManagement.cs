@@ -1,26 +1,65 @@
-﻿using System.Net.Http.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MiniSupermarket.WinForms
 {
     public partial class FormCategoryManagement : Form
     {
-
-        // Khởi tạo HttpClient tĩnh kết nối trực tiếp đến Web API (Đảm bảo số Port https://localhost:7123 khớp với API của bạn)
-        private static readonly HttpClient _client = new HttpClient
-        {
-            BaseAddress = new Uri("https://localhost:7159/api/")
-        };
-
         public FormCategoryManagement()
         {
             InitializeComponent();
         }
 
-        // Sự kiện Form vừa bật lên: Tự động tải dữ liệu từ API lên bảng
+        // =========================================================================
+        // Khởi tạo HttpClient có gắn kèm Bearer Token từ SessionManager
+        // =========================================================================
+        private HttpClient GetAuthenticatedClient()
+        {
+            var client = new HttpClient
+            {
+                BaseAddress = new Uri("https://localhost:7159/api/") // Đảm bảo đúng Port Backend của bạn
+            };
+
+            // Đính kèm Token vào Header nếu đã đăng nhập thành công
+            if (!string.IsNullOrEmpty(SessionManager.JwtToken))
+            {
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", SessionManager.JwtToken);
+            }
+
+            return client;
+        }
+
+        // Sự kiện Form vừa bật lên: Kiểm tra phân quyền giao diện & Tải dữ liệu từ API
         private async void FormCategoryManagement_Load(object sender, EventArgs e)
         {
+            // 1. Phân quyền ẩn/hiện nút bấm dựa vào Role
+            ApplyRolePermissions();
+
+            // 2. Tải dữ liệu lên bảng DataGridView
             await LoadDataAsync();
+        }
+
+        // =========================================================================
+        // Phân quyền giao diện theo Vai trò (Admin / Cashier)
+        // =========================================================================
+        private void ApplyRolePermissions()
+        {
+            // Hiển thị vai trò trên tiêu đề Form
+            this.Text = $"Quản lý danh mục - Người dùng: {SessionManager.CurrentRole}";
+
+            // Nếu không phải Admin (ví dụ là Cashier), vô hiệu hóa các nút Thêm, Sửa, Xóa
+            if (SessionManager.CurrentRole != "Admin")
+            {
+                btnAdd.Enabled = false;
+                btnUpdate.Enabled = false;
+                btnDelete.Enabled = false;
+            }
         }
 
         // Hàm dùng chung: Gọi API GET lấy danh sách và đổ lên DataGridView
@@ -28,8 +67,8 @@ namespace MiniSupermarket.WinForms
         {
             try
             {
-                // Gửi request GET tới endpoint "categories", tự động giải tuần tự hóa chuỗi JSON thành List<CategoryDto>
-                var categories = await _client.GetFromJsonAsync<List<CategoryDto>>("categories");
+                using var client = GetAuthenticatedClient(); // Sử dụng client đã gắn Token
+                var categories = await client.GetFromJsonAsync<List<CategoryDto>>("categories");
                 dgvCategories.DataSource = categories; // Gán nguồn dữ liệu cho bảng hiển thị
             }
             catch (Exception ex)
@@ -44,14 +83,14 @@ namespace MiniSupermarket.WinForms
             await LoadDataAsync();
         }
 
-        // Sự kiện khi click vào một dòng trên DataGridView: Đưa dữ liệu lên các ô nhập (TextBox) để chuẩn bị Sửa/Xóa
+        // Sự kiện khi click vào một dòng trên DataGridView
         private void dgvCategories_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dgvCategories.Rows[e.RowIndex];
-                txtId.Text = row.Cells["CategoryId"].Value.ToString();
-                txtCategoryName.Text = row.Cells["CategoryName"].Value.ToString();
+                txtId.Text = row.Cells["CategoryId"].Value?.ToString() ?? "";
+                txtCategoryName.Text = row.Cells["CategoryName"].Value?.ToString() ?? "";
                 txtDescription.Text = row.Cells["Description"]?.Value?.ToString() ?? string.Empty;
             }
         }
@@ -65,8 +104,8 @@ namespace MiniSupermarket.WinForms
                 Description = txtDescription.Text
             };
 
-            // Gửi request POST kèm theo đối tượng dạng JSON
-            var response = await _client.PostAsJsonAsync("categories", newCat);
+            using var client = GetAuthenticatedClient(); // Dùng client có Token
+            var response = await client.PostAsJsonAsync("categories", newCat);
             if (response.IsSuccessStatusCode)
             {
                 MessageBox.Show("Thêm mới thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -75,7 +114,7 @@ namespace MiniSupermarket.WinForms
             }
             else
             {
-                MessageBox.Show("Thêm mới thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Thêm mới thất bại! Mã lỗi: " + response.StatusCode, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -96,8 +135,8 @@ namespace MiniSupermarket.WinForms
                 Description = txtDescription.Text
             };
 
-            // Gửi request PUT kèm ID trên đường dẫn URI
-            var response = await _client.PutAsJsonAsync($"categories/{id}", updateCat);
+            using var client = GetAuthenticatedClient(); // Dùng client có Token
+            var response = await client.PutAsJsonAsync($"categories/{id}", updateCat);
             if (response.IsSuccessStatusCode)
             {
                 MessageBox.Show("Cập nhật thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -106,7 +145,7 @@ namespace MiniSupermarket.WinForms
             }
             else
             {
-                MessageBox.Show("Cập nhật thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Cập nhật thất bại! Mã lỗi: " + response.StatusCode, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -123,7 +162,8 @@ namespace MiniSupermarket.WinForms
             var confirm = MessageBox.Show($"Bạn có chắc muốn xóa nhóm hàng ID = {id}?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (confirm == DialogResult.Yes)
             {
-                var response = await _client.DeleteAsync($"categories/{id}");
+                using var client = GetAuthenticatedClient(); // Dùng client có Token
+                var response = await client.DeleteAsync($"categories/{id}");
                 if (response.IsSuccessStatusCode)
                 {
                     MessageBox.Show("Xóa thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -132,7 +172,7 @@ namespace MiniSupermarket.WinForms
                 }
                 else
                 {
-                    MessageBox.Show("Xóa thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Xóa thất bại! Mã lỗi: " + response.StatusCode, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }
@@ -149,13 +189,36 @@ namespace MiniSupermarket.WinForms
 
             try
             {
-                // Gọi API dạng: GET /api/categories/search?keyword=abc
-                var result = await _client.GetFromJsonAsync<List<CategoryDto>>($"categories/search?keyword={keyword}");
+                using var client = GetAuthenticatedClient(); // Dùng client có Token
+                var result = await client.GetFromJsonAsync<List<CategoryDto>>($"categories/search?keyword={keyword}");
                 dgvCategories.DataSource = result;
             }
             catch (Exception)
             {
                 MessageBox.Show("Không tìm thấy kết quả phù hợp!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        // =========================================================================
+        // Sự kiện ĐĂNG XUẤT (btnLogout_Click)
+        // =========================================================================
+        private void btnLogout_Click(object sender, EventArgs e)
+        {
+            var confirm = MessageBox.Show("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?",
+                                          "Xác nhận đăng xuất",
+                                          MessageBoxButtons.YesNo,
+                                          MessageBoxIcon.Question);
+
+            if (confirm == DialogResult.Yes)
+            {
+                // 1. Xóa sạch thông tin phiên làm việc (Token & Role)
+                SessionManager.Clear();
+
+                // 2. Đặt DialogResult = OK để báo về cho Program.cs biết là người dùng Đăng xuất
+                this.DialogResult = DialogResult.OK;
+
+                // 3. Đóng Form Quản lý hiện tại
+                this.Close();
             }
         }
 
@@ -165,6 +228,11 @@ namespace MiniSupermarket.WinForms
             txtId.Text = "";
             txtCategoryName.Text = "";
             txtDescription.Text = "";
+        }
+
+        private void dgvCategories_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 
