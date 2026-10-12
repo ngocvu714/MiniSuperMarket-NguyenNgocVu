@@ -193,8 +193,8 @@ Xây dựng đầy đủ RESTful API hỗ trợ các thao tác CRUD Khách hàng
 
 👨‍💻 9. Tác giả
 
-Họ tên sinh viên: Nguyễn Minh Trọng
+Họ tên sinh viên: Nguyen Ngoc Vu
 
-Mã sinh viên: 2124110253
+Mã sinh viên: 2124110251
 
 Lớp học phần: CCQ2411D
