@@ -1,200 +1,81 @@
-🛒 HỆ THỐNG QUẢN LÝ SIÊU THỊ MINI (MINISUPERMARKET SYSTEM)
+📝 BÁO CÁO CÔNG VIỆC BUỔI 4 - DỰ ÁN BÁCH HÓA MINI HỒNG PHÁT
 
-Môn học: Lập trình Ứng dụng .NET Core (Mã môn: 229162)
+🎯 Mục Tiêu Buổi Học
 
-Buổi thực hành: Buổi 3 - Kết nối CSDL SQL Server với Entity Framework Core, Data Seeding và quản lý Khách hàng (Customers)
+Thiết lập và hoàn thiện hệ thống cơ sở dữ liệu (Database) cho dự án "Xây dựng Giải pháp Quản lý Kho và Thanh toán Điện tử cho Cửa hàng Mini - Bách hóa Mini Hồng Phát".
 
-🏗️ 1. Mô hình Kiến trúc Hệ thống (Client - Server)
+Đồng bộ hóa Model Entity Framework Core (EF Core) với cơ sở dữ liệu SQL Server.
 
-Dự án tiếp tục được phát triển theo mô hình Client - Server, kết nối cơ sở dữ liệu SQL Server thông qua Entity Framework Core (EF Core) cùng cơ chế JWT Authentication để xác thực và phân quyền API.
+Khởi tạo dữ liệu mẫu (Data Seeding) chuẩn hóa cho thương hiệu Bách hóa Mini Hồng Phát.
 
-MiniSupermarket.API (Backend): Dự án ASP.NET Core Web API xử lý xác thực JWT, kết nối SQL Server qua Entity Framework Core, thực hiện Data Seeding và cung cấp các RESTful API quản lý hệ thống.
+Kiểm tra tính năng kết nối giữa WinForms Shell Client và Web API Server.
 
-MiniSupermarket.WinForms (Frontend Client): Ứng dụng Windows Forms sử dụng HttpClient gửi nhận dữ liệu JSON và đính kèm JWT Bearer Token trong Header.
+🛠️ Các Công Việc Đã Thực Hiện
 
-Luồng hoạt động của hệ thống:
+1. Khởi Tạo & Đồng Bộ Cơ Sở Dữ Liệu (EF Core Code-First)
 
-┌─────────────────────────────┐
-│   MiniSupermarket.WinForms  │
-│        (Client)             │
-└──────────────┬──────────────┘
-               │
-               │ API Request (HTTP/JSON)
-               │ Authorization: Bearer <JWT>
-               ▼
-┌─────────────────────────────┐
-│     MiniSupermarket.API     │
-│        (Backend)            │
-├─────────────────────────────┤
-│ JWT Authentication & Role   │
-│ Controllers / API           │
-│ Entity Framework Core (ORM) │
-└──────────────┬──────────────┘
-               │
-               │ DbContext / Migrations
-               ▼
-┌─────────────────────────────┐
-│      SQL Server Database    │
-│    (MiniSupermarketDb)      │
-└─────────────────────────────┘
+Xây dựng file SupermarketDbContext.cs với đầy đủ cấu trúc quan hệ giữa các bảng:
 
+Categories (Danh mục sản phẩm)
 
-🛠️ 2. Công nghệ Sử dụng
+Products (Sản phẩm kho)
 
-Ngôn ngữ: C# (.NET 8.0)
+Customers (Khách hàng)
 
-Backend: ASP.NET Core Web API
+Roles (Vai trò)
 
-ORM & Database Access: Entity Framework Core 8.0 (Code-First Migration & Data Seeding)
+Users (Tài khoản nhân viên)
 
-Database: Microsoft SQL Server (SupermarketDbContext)
+Orders & OrderDetails (Đơn hàng và Chi tiết đơn hàng)
 
-Authentication & Authorization: JWT Bearer Authentication, Role-based Authorization
+Thực hiện xử lý lỗi build, làm sạch lịch sử migration và chạy các lệnh EF Core thành công:
 
-Frontend: Windows Forms (.NET 8.0)
+Add-Migration InitialCreateDatabaseV2
 
-HTTP Client: HttpClient, System.Net.Http.Json
-
-Kiểm thử API: Swagger UI
-
-Quản lý phiên bản: Git & GitHub
-
-📂 3. Cấu trúc Solution
-
-MiniSupermarketSystem/
-│
-├── MiniSupermarket.API/                  # Dự án Web API (Backend)
-│   ├── Controllers/
-│   │   ├── AuthController.cs             # Đăng nhập và cấp JWT Token
-│   │   ├── CategoriesController.cs       # CRUD Danh mục sản phẩm
-│   │   └── CustomersController.cs        # CRUD Khách hàng (Customers)
-│   │
-│   ├── Data/
-│   │   └── SupermarketDbContext.cs       # EF Core DbContext, Cấu hình Entity & Data Seeding
-│   │
-│   ├── Migrations/                       # Thư mục chứa các bản EF Core Migration
-│   │
-│   ├── Models/
-│   │   ├── Category.cs                   # Model danh mục
-│   │   ├── Customer.cs                   # Model khách hàng (CustomerId, CustomerName, PhoneNumber, Address, MembershipRank, RewardPoints)
-│   │   └── User.cs                       # Model người dùng & tài khoản
-│   │
-│   ├── Services/
-│   │   └── JwtService.cs                 # Service khởi tạo JWT Token
-│   │
-│   ├── Program.cs                        # Register DbContext, JWT & Dependency Injection
-│   └── appsettings.json                  # Cấu hình ConnectionString & JWT Settings
-│
-└── MiniSupermarket.WinForms/             # Dự án Windows Forms (Frontend)
-    ├── FormLogin.cs                      # Giao diện đăng nhập
-    ├── FormCategoryManagement.cs         # Quản lý danh mục
-    ├── FormCustomerManagement.cs         # Quản lý khách hàng
-    └── ApiClientService.cs               # Service gọi API và quản lý JWT Token
-
-
-🗄️ 4. Cơ sở dữ liệu & Data Seeding (Customers)
-
-Hệ thống đã chuyển sang lưu trữ dữ liệu tập trung trên SQL Server. Entity Customer được cấu hình Data Seeding gồm 15 khách hàng mẫu sẵn có trong cơ sở dữ liệu:
-
-Danh sách 15 Khách hàng Seeding mẫu:
-
-Nguyễn Văn An - SĐT: 0912345678 - Hạng: Bạc - Điểm: 350
-
-Trần Thị Bình - SĐT: 0987654321 - Hạng: Kim Cương - Điểm: 1200
-
-Lê Hoàng Cường - SĐT: 0903112233 - Hạng: Chuẩn - Điểm: 50
-
-Phạm Minh Dung - SĐT: 0938889900 - Hạng: Vàng - Điểm: 750
-
-Hoàng Quốc Dung - SĐT: 0977123456 - Hạng: Chuẩn - Điểm: 0
-
-Đỗ Thị Giang - SĐT: 0966554433 - Hạng: Chuẩn - Điểm: 150
-
-Vũ Hải Đăng - SĐT: 0944118899 - Hạng: Bạc - Điểm: 520
-
-Ngô Bích Hằng - SĐT: 0918273645 - Hạng: Kim Cương - Điểm: 2100
-
-Bùi Anh Tuấn - SĐT: 0922334455 - Hạng: Vàng - Điểm: 890
-
-Đặng Thu Thảo - SĐT: 0955667788 - Hạng: Bạc - Điểm: 410
-
-Trịnh Quốc Bảo - SĐT: 0909090909 - Hạng: Chuẩn - Điểm: 30
-
-Lý Mỹ Nhân - SĐT: 0933221100 - Hạng: Vàng - Điểm: 1050
-
-Dương Văn Khoa - SĐT: 0978990011 - Hạng: Bạc - Điểm: 620
-
-Mai Phương Thúy - SĐT: 0911223344 - Hạng: Kim Cương - Điểm: 1850
-
-Cao Thái Sơn - SĐT: 0945678901 - Hạng: Chuẩn - Điểm: 95
-
-⚙️ 5. Hướng dẫn Khởi tạo & Cập nhật Database (EF Core Migrations)
-
-Khi làm mới database hoặc cập nhật Data Seeding trong SupermarketDbContext.cs, thực hiện các bước sau trong Package Manager Console (PMC):
-
-# 1. Xóa CSDL cũ (nếu muốn reset sạch)
-Drop-Database
-
-# 2. Tạo bản Migration mới
-Add-Migration InitialCreate
-
-# 3. Cập nhật schema và nạp 15 dữ liệu Seeding vào SQL Server
 Update-Database
 
+Cấu hình chuỗi kết nối kết nối thành công với cơ sở dữ liệu SQL Server (NguyenNgocVu-SupermarketDb).
 
-🔐 6. Xử lý Quản lý Version với Git
+2. Nạp Dữ Liệu Mẫu (Data Seeding) - Bách Hóa Mini Hồng Phát
 
-Quy trình commit và đồng bộ code lên GitHub branch Buoi3:
+15 Danh mục sản phẩm (Categories): Bao gồm Gạo & Lương thực, Mì/Phở/Cháo, Gia vị nhà bếp, Đồ uống giải khát, Sữa & Sản phẩm từ sữa, Bánh kẹo & Snack, Hóa mỹ phẩm, v.v.
 
-# 1. Kiểm tra trạng thái thay đổi
-git status
+15 Sản phẩm tiêu biểu (Products): Được gán mã Barcode chuẩn (HP8935001001 - HP8935001015), đơn vị tính, giá bán và số lượng tồn kho thực tế.
 
-# 2. Thêm tất cả thay đổi vào Staging
-git add .
+15 Khách hàng thành viên (Customers): Tích hợp thông tin phân hạng (Kim Cương, Vàng, Bạc, Thân Thiết) và điểm thưởng.
 
-# 3. Commit thay đổi
-git commit -m "Update customer seed data to 15 records and reset migrations"
+3 Vai trò hệ thống (Roles): Admin, Cashier (Thu ngân), Warehouse (Quản lý kho).
 
-# 4. Push lên GitHub (Dùng --force nếu cần đè lại lịch sử Migration mới)
-git push origin Buoi3 --force
+15 Tài khoản nhân viên (Users): Phân quyền đúng với 3 vai trò hệ thống để phục vụ kiểm thử tính năng RBAC.
 
+3. Cấu Hình & Kiểm Thử Hệ Thống
 
-🧪 7. Kiểm thử API bằng Swagger UI
+Thiết lập cấu hình Multiple Startup Projects trong Visual Studio để khởi chạy đồng thời cả hai dự án:
 
-Sau khi khởi chạy MiniSupermarket.API:
+MiniSupermarket.API (Web API Server trên cổng 7292)
 
-Đăng nhập: Gọi POST /api/auth/login với tài khoản admin (admin / 123456) để lấy JWT Token.
+MiniSupermarket.WinForm (Client UI)
 
-Xác thực: Bấm nút Authorize trên góc Swagger UI và dán Token vào dạng Bearer <JWT_TOKEN>.
+Sửa lỗi kết nối Connection Refused (localhost:7292) và kiểm tra thành công luồng đăng nhập phân quyền từ WinForms thông qua API.
 
-Thao tác Khách hàng (CustomersController):
+🚀 Hướng Dẫn Chạy Dự Án
 
-GET /api/customers: Lấy danh sách 15 khách hàng seeding.
+Mở Solution MiniSupermarket.sln trong Visual Studio.
 
-GET /api/customers/{id}: Xem thông tin chi tiết một khách hàng.
+Kiểm tra chuỗi kết nối kết nối trong file appsettings.json tại project MiniSupermarket.API.
 
-POST /api/customers: Thêm mới khách hàng.
+Nhấp chuột phải vào Solution -> chọn Properties -> chọn Multiple startup projects -> Đặt Action của MiniSupermarket.API và MiniSupermarket.WinForm thành Start.
 
-PUT /api/customers/{id}: Cập nhật thông tin khách hàng.
+Nhấn F5 để chạy dự án.
 
-DELETE /api/customers/{id}: Xóa khách hàng.
+Sử dụng các tài khoản thử nghiệm:
 
-📌 8. Kết quả Đạt được (Buổi 3)
+Admin: admin01 / 123456
 
-Kết nối thành công ASP.NET Core Web API với cơ sở dữ liệu SQL Server thông qua Entity Framework Core.
+Thu ngân (Cashier): cashier01 / 123456
 
-Xây dựng Entity Customer và cấu hình Data Seeding đầy đủ 15 khách hàng đa dạng các hạng thành viên (Chuẩn, Bạc, Vàng, Kim Cương).
+Thủ kho (Warehouse): ware01 / 123456
 
-Quản lý sạch sẽ lịch sử Migration và cập nhật cơ sở dữ liệu nhất quán.
-
-Xây dựng đầy đủ RESTful API hỗ trợ các thao tác CRUD Khách hàng kết hợp phân quyền JWT Authentication.
-
-Đồng bộ và đẩy mã nguồn hoàn chỉnh lên Git / GitHub branch Buoi3.
-
-👨‍💻 9. Tác giả
-
-Họ tên sinh viên: Nguyễn Minh Trọng
-
-Mã sinh viên: 2124110253
-
-Lớp học phần: CCQ2411D
+Ngày hoàn tất: 15/10/2026
+Ho ten SV: Nguyen Ngoc Vu
+MSSV: 2124110251
