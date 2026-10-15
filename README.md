@@ -1,4 +1,46 @@
 📝 BÁO CÁO CÔNG VIỆC BUỔI 4 - DỰ ÁN BÁCH HÓA MINI HỒNG PHÁT
+## 📂 Cấu trúc thư mục dự án (Project Structure)
+
+```text
+MiniSupermarket/
+├── 📄 README.md                                  # Tài liệu hướng dẫn & Báo cáo công việc
+├── 📄 MiniSupermarket.sln                       # Visual Studio Solution File
+│
+├── 📁 MiniSupermarket.API/                      # Backend Web API (ASP.NET Core Web API)
+│   ├── 📁 Controllers/                          # API RESTful Controllers
+│   │   ├── AuthController.cs                    # Xử lý Đăng nhập & Cấp phát JWT Token
+│   │   ├── CategoriesController.cs              # Quản lý Danh mục sản phẩm (CRUD)
+│   │   ├── CustomerController.cs                # Quản lý Khách hàng & Tích điểm (CRUD)
+│   │   ├── OrdersController.cs                  # Xử lý Hóa đơn & Đơn hàng POS
+│   │   ├── ProductsController.cs                # Quản lý Sản phẩm & Tồn kho (CRUD)
+│   │   ├── RolesController.cs                   # Quản lý Chức năng Phân quyền
+│   │   └── UsersController.cs                   # Quản lý Tài khoản Nhân viên
+│   ├── 📁 Data/                                 # Cấu hình Entity Framework Core
+│   │   └── SupermarketDbContext.cs              # DbContext & Seed Data Bách hóa Hồng Phát
+│   ├── 📁 Migrations/                           # Các bản Migration của Database SQL Server
+│   ├── 📁 Models/                               # Entities Mapping với Database
+│   │   ├── Category.cs
+│   │   ├── Customer.cs
+│   │   ├── Order.cs
+│   │   ├── OrderDetail.cs
+│   │   ├── Product.cs
+│   │   ├── Roles.cs
+│   │   └── User.cs
+│   ├── 📄 appsettings.json                      # Cấu hình Chuỗi kết nối SQL Server & JWT Key
+│   └── 📄 Program.cs                            # Khởi tạo Web API Service & Middleware
+│
+└── 📁 MiniSupermarket.WinForm/                  # Frontend Giao diện Quản lý (C# WinForms)
+    ├── 📁 Forms/                                # Các Form Giao diện Chức năng
+    │   ├── FormCategoryManagement.cs            # Giao diện Quản lý Danh mục
+    │   ├── FormCustomerManagement.cs            # Giao diện Quản lý Khách hàng
+    │   ├── FormLogin.cs                         # Giao diện Đăng nhập Hệ thống
+    │   ├── FormMainShell.cs                     # Cửa sổ chính (Shell) chứa Sidebar/Header
+    │   ├── FormPOS.cs                           # Giao diện Quầy Bán hàng & Thu ngân
+    │   ├── FormProductManagement.cs             # Giao diện Quản lý Sản phẩm & Tồn kho
+    │   ├── FormQuickReport.cs                   # Giao diện Báo cáo Doanh thu
+    │   └── FormUserManagement.cs                # Giao diện Quản trị Tài khoản Nhân viên
+    ├── 📄 SessionManager.cs                     # Lưu trữ Token JWT & Phiên làm việc
+    └── 📄 Program.cs
 
 🎯 Mục Tiêu Buổi Học
 
